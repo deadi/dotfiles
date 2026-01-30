@@ -34,4 +34,7 @@ keybind = super+control+shift+alt+arrow_right=resize_split:right,100
 mouse-scroll-multiplier = 0.95
 
 # Shell
-#command = /usr/bin/zsh
+command = /usr/bin/zsh
+
+# background
+background-opacity = 0.90

@@ -1,0 +1,12 @@
+# ssh
+alias sdoc='ssh adi@doc.krang.lan'
+alias shoa='ssh adi@hoa.krang.lan'
+alias siot='ssh adi@iot.krang.lan'
+
+# git
+alias gs='git status'
+alias ga='git add .'
+alias gaa='git add --all'
+
+alias ll='ls -lah'
+

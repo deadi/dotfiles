@@ -7,6 +7,11 @@ alias siot='ssh adi@iot.krang.lan'
 alias gs='git status'
 alias ga='git add .'
 alias gaa='git add --all'
+alias gc='git commit'
+alias gcm='git commit -m'
+alias gca='git commit --amend'
+alias gcam='git commit --amend -m'
 
+# other
 alias ll='ls -lah'
 

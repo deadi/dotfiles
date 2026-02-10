@@ -54,5 +54,5 @@ fi
 alias tm=new_tmux
 
 # --- Aliases (shared) ---
-[[ -f ~/.aliases ]] && source ~/.aliases
+[[ -f $HOME/.aliases ]] && source $HOME/.aliases
 

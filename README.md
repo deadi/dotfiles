@@ -79,6 +79,7 @@ stow nvim
 stow tmux
 stow starship
 stow aliases
+stow bashrc
 ```
 
 If you use Ghostty on that machine too:
@@ -108,6 +109,23 @@ Add this once to `~/.bashrc`:
 
 ```bash
 grep -Fxq 'eval "$(zoxide init bash)"' ~/.bashrc || echo 'eval "$(zoxide init bash)"' >> ~/.bashrc
+```
+
+Then reload shell:
+
+```bash
+source ~/.bashrc
+```
+
+### 4.2) Enable `starship` prompt in Bash (if installed)
+
+If `which starship` returns a binary path but your prompt never changes, you're likely
+missing the shell init line.
+
+Add this once to `~/.bashrc`:
+
+```bash
+grep -Fxq 'eval "$(starship init bash)"' ~/.bashrc || echo 'eval "$(starship init bash)"' >> ~/.bashrc
 ```
 
 Then reload shell:
@@ -209,6 +227,9 @@ If you prefer your script-driven approach, keep using `install-dotfiles.sh` from
 - **aliases not loaded:**
   - verify the alias source line exists in `~/.bashrc`
   - run `source ~/.bashrc`
+- **`starship` is installed but prompt does not change:**
+  - verify this line exists in `~/.bashrc`: `eval "$(starship init bash)"`
+  - run `source ~/.bashrc`
 
 ---
 
@@ -217,7 +238,7 @@ If you prefer your script-driven approach, keep using `install-dotfiles.sh` from
 ```bash
 cd ~/dotfiles
 git pull
-stow nvim tmux starship aliases
+stow nvim tmux starship aliases bashrc
 ```
 
 Then restart tmux/Neovim if needed.

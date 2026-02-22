@@ -1,7 +1,7 @@
 # ssh
 alias sdoc='ssh adi@doc.krang.lan'
 alias shoa='ssh adi@hoa.krang.lan'
-alias siot='ssh adi@iot.krang.lan'
+alias siot='ssh pi@iot.krang.lan'
 
 # git
 alias gst='git status'

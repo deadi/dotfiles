@@ -1,0 +1,7 @@
+[Unit]
+Description=Run script %i
+
+[Service]
+Type=oneshot
+ExecStart=%h/scripts/%i
+WorkingDirectory=%h/scripts

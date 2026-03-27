@@ -15,3 +15,5 @@ alias gcam='git commit --amend -m'
 # other
 alias ll='ls -lah'
 
+# files
+alias ya='yazi'

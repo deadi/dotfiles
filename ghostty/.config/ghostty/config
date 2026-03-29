@@ -9,3 +9,7 @@ gtk-titlebar = false
 
 # Shell
 #command = /usr/bin/zsh
+
+# Cursor styling + SSH session terminfo
+# (all shell integration options must be passed together)
+shell-integration-features = no-cursor,ssh-env

@@ -1,8 +1,6 @@
 # Omarchy Dotfiles (SSH + Neovim setup)
 
-This repository is meant to make a remote Linux server feel like your Omarchy setup, especially for **Neovim** workflows over SSH.
-
-If you already use an `install-dotfiles.sh` script with GNU Stow in your `omarchy-supplement` repo, this guide gives you a repeatable way to get the same editing experience on your doc server.
+If you already use an `install-dotfiles.sh` script with GNU Stow in your `omarchy-supplement` repo, this guide gives you a repeatable way to get the same editing experience on other servers.
 
 ---
 
@@ -88,6 +86,14 @@ If you use Ghostty on that machine too:
 stow ghostty
 ```
 
+
+# Needs checking with `install-hyprland-overrides.sh` from repo `omarchy-supplement`
+
+(currently with stow) 
+```bash
+stow hyprland
+```
+
 ### 4) Make sure aliases are loaded in Bash
 
 Append once to `~/.bashrc`:
@@ -147,98 +153,3 @@ On first run, your plugin manager may bootstrap and install plugins. Wait for co
 ```bash
 fzf --version
 zoxide --version
-```
-
-Useful commands:
-
-- `zi <partial-folder-name>`: jump quickly to frequently-used directories
-- `z <partial-folder-name>`: classic jump command
-- `Ctrl-r` in shell: fuzzy history search (`fzf`-powered in many setups)
-
----
-
-## Recommended SSH workflow (Neovim + tmux)
-
-For remote work, use `tmux` so your editing session survives network drops.
-
-### First login
-
-```bash
-tmux new -s work
-nvim
-```
-
-### Later logins
-
-```bash
-tmux attach -t work
-```
-
-### Useful tmux basics
-
-- `Ctrl-b d` → detach from session (keeps programs running)
-- `tmux ls` → list sessions
-- `tmux kill-session -t work` → remove session
-
----
-
-## Do you need tmux?
-
-Short answer: **for SSH, yes (strongly recommended)**.
-
-Use tmux when you want:
-
-- persistent Neovim sessions after disconnects
-- multiple terminals/windows on one SSH connection
-- long-running jobs that continue in background
-
-You can run `nvim` without tmux, but every disconnect ends your session.
-
-## Can you use `fzf` and `zoxide` too?
-
-Yes — absolutely. They are a great match for remote Neovim workflows:
-
-- `fzf`: fuzzy-find files, command history, and grep results quickly.
-- `zoxide`: jump to project folders instantly based on usage frequency.
-
-If your Omarchy config/aliases already define shortcuts around these tools, they should work after installing the binaries and sourcing your aliases + `zoxide init` line in shell startup.
-
----
-
-## Optional: automated install script
-
-If you prefer your script-driven approach, keep using `install-dotfiles.sh` from `omarchy-supplement` and point it to this repo URL. A minimal safe flow is:
-
-1. verify `stow` is installed
-2. clone or update `~/dotfiles`
-3. remove old conflicting config paths
-4. run `stow` for needed packages (`nvim`, `tmux`, `starship`, `aliases`, ...)
-5. ensure `~/.aliases` is sourced by your shell startup file
-
----
-
-## Troubleshooting
-
-- **`nvim` looks different than Omarchy:**
-  - confirm `~/.config/nvim` is symlinked from this repo
-  - remove old `~/.local/share/nvim` and `~/.cache/nvim`, then reopen `nvim`
-- **`stow` conflicts:**
-  - move or remove existing target files, then run stow again
-- **aliases not loaded:**
-  - verify the alias source line exists in `~/.bashrc`
-  - run `source ~/.bashrc`
-- **`starship` is installed but prompt does not change:**
-  - verify this line exists in `~/.bashrc`: `eval "$(starship init bash)"`
-  - run `source ~/.bashrc`
-
----
-
-## Updating later
-
-```bash
-cd ~/dotfiles
-git pull
-stow nvim tmux starship aliases bashrc
-```
-
-Then restart tmux/Neovim if needed.

@@ -147,9 +147,3 @@ nvim
 ```
 
 On first run, your plugin manager may bootstrap and install plugins. Wait for completion, then restart Neovim.
-
-### 6) Verify `fzf` + `zoxide` are available
-
-```bash
-fzf --version
-zoxide --version

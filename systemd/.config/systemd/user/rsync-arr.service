@@ -3,5 +3,5 @@ Description=Rsync ARR Script
 
 [Service]
 Type=oneshot
-ExecStart=%h/scripts/rsync_arr.sh
-WorkingDirectory=%h/scripts
+ExecStart=%h/scripts/filemanagement/rsync_arr.sh
+WorkingDirectory=%h/scripts/filemanagement

@@ -17,3 +17,9 @@ alias ll='ls -lah'
 
 # files
 alias ya='yazi'
+
+#editor
+alias vi='nvim'
+
+# python
+alias py='python3'

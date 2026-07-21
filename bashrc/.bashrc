@@ -133,11 +133,14 @@ fi
 # Directory jumping
 if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init bash)"
+fi
 
-# clear screen
+# Clear screen and show system info on shell start
 clear
 neofetch
 
-fi
+# Local bin path
 export PATH="$HOME/.local/bin:$PATH"
-. "$HOME/.cargo/env"
+
+# Cargo env (adds ~/.cargo/bin to PATH)
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"

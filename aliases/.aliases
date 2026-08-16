@@ -18,10 +18,16 @@ alias ll='ls -lah'
 # files
 alias ya='yazi'
 
-if command -v fzf >/dev/null 2>&1 && command -v bat >/dev/null 2>&1; then
-  alias ff="fzf --preview 'bat --style=numbers --color=always {}'"
+# bat is called batcat on Debian/Ubuntu
+if command -v batcat >/dev/null 2>&1; then
+    BAT_CMD=batcat
+elif command -v bat >/dev/null 2>&1; then
+    BAT_CMD=bat
 fi
 
+if command -v fzf >/dev/null 2>&1 && [ -n "$BAT_CMD" ]; then
+    alias ff="fzf --preview '$BAT_CMD --style=numbers --color=always {}'"
+fi
 #editor
 alias vi='nvim'
 

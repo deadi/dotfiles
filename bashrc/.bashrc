@@ -89,3 +89,22 @@ export PATH="$PATH:$HOME/.local/bin"
 
 # Cargo env (adds ~/.cargo/bin to PATH)
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+. "$HOME/.local/share/../bin/env"
+
+# Number-Converter bin octal decimal hexadecimal
+conv() {  # conv <b|o|d|h> <zahl>
+  local base
+  case $1 in b) base=2;; o) base=8;; d) base=10;; h) base=16;; *) echo "usage: conv b|o|d|h zahl"; return 1;; esac
+  local n=$(( ${base}#${2#0[xX]} )) i bin=""
+  i=$n
+  (( n == 0 )) && bin=0
+  while (( i > 0 )); do bin=$(( i & 1 ))$bin; i=$(( i >> 1 )); done
+  printf 'bin: %s\noct: %o\ndec: %d\nhex: %X\n' "$bin" $n $n $n
+}
+
+# log2(expr) - calculator, akzeptiert arithmetische Ausdruecke
+# usage: log2 4 | log2 "1/(0.5/99)"
+log2() { awk "BEGIN{printf \"%.6g\n\", log($1)/log(2)}"; }
+
+

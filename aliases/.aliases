@@ -14,6 +14,7 @@ alias gcam='git commit --amend -m'
 
 # other
 alias ll='ls -lah'
+alias la='ls -la'
 
 # files
 alias ya='yazi'
@@ -54,3 +55,17 @@ alias dcps='docker compose ps'
 alias dl='docker logs -f'
 alias dex='docker exec -it'
 alias dsh='docker exec -it $1 sh'      # note: needs a function, not alias, to take args cleanly
+
+# reload shell
+alias rldsh='. ~/.bashrc  || . ~/.bash_aliases'
+
+# docker
+alias dc='docker compose'
+#alias dc='docker compose --env-file ~/.config/docker/storage.env'
+alias cdd='cd /srv/work/docker'
+alias dps='docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"'
+alias dstp='sudo docker stop $(sudo docker ps -q)'
+
+## arr_gluetun ipinfo
+alias vpnip='docker exec arr_gluetun wget -qO- https://ipinfo.io'
+alias vpnlog='docker logs arr_gluetun 2>&1 | grep -i "public ip" | tail -n 3'

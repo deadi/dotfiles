@@ -1,149 +1,116 @@
-# Omarchy Dotfiles (SSH + Neovim setup)
+# Dotfiles (Omarchy laptop + Ubuntu server `doc`)
 
-If you already use an `install-dotfiles.sh` script with GNU Stow in your `omarchy-supplement` repo, this guide gives you a repeatable way to get the same editing experience on other servers.
+One repo for several machines, installed with GNU Stow. Every top-level folder is a **stow package**: its contents mirror `$HOME` (`bashrc/.bashrc` becomes `~/.bashrc`).
 
----
-
-## Goal
-
-After setup, when you SSH into your server and run `nvim`, you should get:
-
-- your Omarchy Neovim config
-- matching aliases and shell behavior
-- tmux integration for persistent sessions
-- starship prompt (optional but recommended)
-- optional `fzf` + `zoxide` navigation workflow
+Rule for this repo: anything machine-specific is guarded, so the same files work everywhere (`[ -f … ] && …`, `command -v … &&`, or a fallback). Examples: the `uv env` line in `bashrc`, and `nvim/.config/nvim/lua/plugins/theme.lua` (Omarchy theme if present, tokyonight otherwise).
 
 ---
 
-## Prerequisites (on the remote server)
+## Packages per machine
 
-Install required packages first.
+| Package | Laptop (Omarchy) | Server (Ubuntu) | Notes |
+| --- | --- | --- | --- |
+| `bashrc` | yes | yes | Has an Omarchy block and a Debian/Ubuntu fallback. Already loads `.aliases`, starship, fzf and zoxide when installed. |
+| `aliases` | yes | yes | Loaded from `bashrc`. |
+| `nvim` | yes | yes | `theme.lua` falls back to tokyonight without Omarchy. |
+| `tmux` | yes | yes | |
+| `starship` | yes | yes | Optional, needs the binary. |
+| `ghostty`, `kitty` | yes | no | Terminal emulators, GUI only. |
+| `hyprland` | yes | no | Needs checking against `install-hyprland-overrides.sh` in `omarchy-supplement`. |
+| `systemd` | yes | no | User units, check before stowing. |
 
-### Arch-based server
+> [!note] Current state on the laptop
+> `~/.bashrc` is a stow link. `~/.config/nvim`, `~/.config/starship.toml` and `~/.config/tmux` are plain files there, not links into this repo. Check what Stow would do before changing that: `stow -n -v <package>` (dry run, changes nothing).
 
-```bash
-sudo pacman -S --needed git stow neovim tmux starship fzf zoxide
-```
+---
 
-### Debian/Ubuntu-based server
+## Setup on the server (Ubuntu)
+
+### 1) Packages
 
 ```bash
 sudo apt update
 sudo apt install -y git stow neovim tmux fzf zoxide
 ```
+`starship` comes from its official installer if you want the same prompt.
 
-(Install `starship` from its official installer if you want the same prompt there too.)
+Arch-based server instead: `sudo pacman -S --needed git stow neovim tmux starship fzf zoxide`.
 
----
-
-## Step-by-step setup
-
-### 1) Clone this repository on the server
+### 2) Clone
 
 ```bash
 cd ~
 git clone https://github.com/deadi/dotfiles
 cd dotfiles
 ```
+Repo already there: `cd ~/dotfiles && git pull`.
 
-If the repo already exists:
+### 3) Check, then stow
+
+Always start with a dry run. It lists conflicts (existing files that are not links) without touching anything:
 
 ```bash
 cd ~/dotfiles
-git pull
+stow -n -v bashrc aliases nvim tmux starship
 ```
 
-### 2) Clean old Neovim state (recommended)
-
-This avoids plugin/cache conflicts from previous configs.
+If it reports no conflicts:
 
 ```bash
-rm -rf ~/.config/nvim ~/.local/share/nvim ~/.cache/nvim
+stow bashrc aliases nvim tmux starship
 ```
 
-Also clean old files you replace via stow:
+**Conflict on an existing file** (for example your old `~/.bashrc`): back it up, then stow.
 
 ```bash
-rm -f ~/.config/starship.toml
-```
-
-### 3) Stow the packages
-
-From inside `~/dotfiles`:
-
-```bash
-stow nvim
-stow tmux
-stow starship
-stow aliases
+mv ~/.bashrc ~/.bashrc.bak
 stow bashrc
 ```
+`stow --adopt <package>` instead moves the existing file **into the repo and overwrites the repo's version**. Only use it when the local file is the one you want, and read `git diff` afterwards (`git restore <file>` undoes it).
 
-If you use Ghostty on that machine too:
+> [!warning] Neovim state
+> Only if you really want a clean start, remove old Neovim data first: `rm -rf ~/.local/share/nvim ~/.cache/nvim`. Do **not** run this on the laptop without looking, it deletes plugins and caches. Back up `~/.config/nvim` (`mv`, not `rm`) before stowing `nvim`.
 
-```bash
-stow ghostty
-```
-
-
-# Needs checking with `install-hyprland-overrides.sh` from repo `omarchy-supplement`
-
-(currently with stow) 
-```bash
-stow hyprland
-```
-
-### 4) Make sure aliases are loaded in Bash
-
-Append once to `~/.bashrc`:
-
-```bash
-ALIAS_LINE='[ -f "$HOME/.aliases" ] && . "$HOME/.aliases"'
-grep -Fxq "$ALIAS_LINE" "$HOME/.bashrc" || echo "$ALIAS_LINE" >> "$HOME/.bashrc"
-```
-
-Apply it immediately:
+### 4) Reload and start
 
 ```bash
 source ~/.bashrc
+nvim        # first start installs the plugins, wait, then restart
 ```
 
-### 4.1) Enable `zoxide` in Bash (if installed)
+---
 
-Add this once to `~/.bashrc`:
+## Setup on the laptop (Omarchy)
+
+Run from `~/dotfiles` and always dry-run first:
 
 ```bash
-grep -Fxq 'eval "$(zoxide init bash)"' ~/.bashrc || echo 'eval "$(zoxide init bash)"' >> ~/.bashrc
+stow -n -v bashrc aliases
+stow bashrc aliases
 ```
+Add `ghostty`, `kitty`, `hyprland`, `systemd` only after checking them with `stow -n -v`.
 
-Then reload shell:
+---
+
+## Changing a file
+
+Edit it **inside the repo** (or through the link, which is the same file), then:
 
 ```bash
-source ~/.bashrc
+cd ~/dotfiles
+git diff
+git commit -am "what changed"
+git push
 ```
+On the other machine: `cd ~/dotfiles && git pull`. Stowed files update immediately, a new shell picks up `.bashrc`.
 
-### 4.2) Enable `starship` prompt in Bash (if installed)
+If `git status` stays clean after editing `~/.bashrc`, it is probably not a link: `ls -l ~/.bashrc`.
 
-If `which starship` returns a binary path but your prompt never changes, you're likely
-missing the shell init line.
+---
 
-Add this once to `~/.bashrc`:
+## Troubleshooting
 
-```bash
-grep -Fxq 'eval "$(starship init bash)"' ~/.bashrc || echo 'eval "$(starship init bash)"' >> ~/.bashrc
-```
-
-Then reload shell:
-
-```bash
-source ~/.bashrc
-```
-
-### 5) Start Neovim and let plugins install
-
-```bash
-nvim
-```
-
-On first run, your plugin manager may bootstrap and install plugins. Wait for completion, then restart Neovim.
+- **`stow` reports `cannot stow … over existing target`:** a normal file is in the way. Back it up (`mv`), then stow again.
+- **`.bashrc` error `No such file or directory` at login:** a line sources a file that is missing on this machine. Guard it with `[ -f … ] &&`.
+- **Neovim `failed to load plugins.theme`:** `theme.lua` must be a real file, not a link to Omarchy (see the top of this file).
+- **Unsure what a command does:** add `-n -v` to `stow`, it only prints.

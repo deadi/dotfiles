@@ -90,7 +90,8 @@ export PATH="$PATH:$HOME/.local/bin"
 # Cargo env (adds ~/.cargo/bin to PATH)
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
-. "$HOME/.local/share/../bin/env"
+# uv env (adds ~/.local/bin to PATH), only if present: missing on doc
+[ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 
 # Number-Converter bin octal decimal hexadecimal
 conv() {  # conv <b|o|d|h> <zahl>
@@ -107,12 +108,10 @@ conv() {  # conv <b|o|d|h> <zahl>
 # usage: log2 4 | log2 "1/(0.5/99)"
 log2() { awk "BEGIN{printf \"%.6g\n\", log($1)/log(2)}"; }
 
-
-
 # worksync [-n] [--delete] - one-way sync ~/Work -> ~/obsidian/AdiOps/w/Work
 # -n = dry run, --delete = also remove files in the target that are gone from ~/Work
 # no --delete by default, so nothing in the vault is ever removed unasked.
-# Excludes big/binary/generated stuff because the vault is synced to MEGA.
+# Excludes big/binary/generated stuff, backups and secrets because the vault is synced to MEGA.
 worksync() {
   local src=$HOME/Work/ dst=$HOME/obsidian/AdiOps/w/Work/ opts=(-a --human-readable --itemize-changes)
   local arg

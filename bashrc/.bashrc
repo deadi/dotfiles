@@ -108,3 +108,29 @@ conv() {  # conv <b|o|d|h> <zahl>
 log2() { awk "BEGIN{printf \"%.6g\n\", log($1)/log(2)}"; }
 
 
+
+# worksync [-n] [--delete] - one-way sync ~/Work -> ~/obsidian/AdiOps/w/Work
+# -n = dry run, --delete = also remove files in the target that are gone from ~/Work
+# no --delete by default, so nothing in the vault is ever removed unasked.
+# Excludes big/binary/generated stuff because the vault is synced to MEGA.
+worksync() {
+  local src=$HOME/Work/ dst=$HOME/obsidian/AdiOps/w/Work/ opts=(-a --human-readable --itemize-changes)
+  local arg
+  for arg in "$@"; do
+    case $arg in
+      -n) opts+=(--dry-run);;
+      --delete) opts+=(--delete);;
+      *) echo "usage: worksync [-n] [--delete]"; return 1;;
+    esac
+  done
+  [[ -d $src ]] || { echo "worksync: $src missing"; return 1; }
+  mkdir -p "$dst" || return 1
+  rsync "${opts[@]}" \
+    --exclude='*.AppImage' --exclude='.git/' --exclude='node_modules/' \
+    --exclude='__pycache__/' --exclude='.venv/' --exclude='venv/' \
+    --exclude='arduino/' --exclude='.mise.toml' \
+    --exclude='*.bak' --exclude='*.bak.*' --exclude='.env' --exclude='.env.*' \
+    --exclude='*secret*' --exclude='*password*' --exclude='*credential*' --exclude='*.key' \
+    --exclude='*.pem' --exclude='*.token' --exclude='id_rsa*' --exclude='id_ed25519*' \
+    "$src" "$dst"
+}
